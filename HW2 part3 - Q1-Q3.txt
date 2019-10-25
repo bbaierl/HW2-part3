@@ -1,0 +1,169 @@
+Q1) prints (x*y) -(x/2)
+	-or in this case with 3, 5, and 0, 3*5 - 3/2 = 14
+C file is called Q1.c
+//setup
+push ebp
+mov ebp, esp
+and esp, 0FFFFFFF0h
+sub esp, 20h
+
+
+call ___main				
+mov dword ptr [esp+1Ch], 3		
+mov dword ptr [esp+18h], 5		
+mov dword ptr [esp+14h], 0		//Initaites values x = 3,y= 5,z = 0
+mov eax, [esp+1Ch]			moves x to eax
+imul eax, [esp+18h]			mutiplies x and y moves x*y to eax
+mov edx, eax				moves x*y to edx
+mov eax, [esp+1Ch]			moves x to eax
+mov ecx, eax				moves x to ecx
+shr ecx, 1Fh				shifts 31 bits leaving only sign bit of 0 in ecx
+add eax, ecx				adds 0 with x stored in eax
+sar eax, 1				shifts bit right one bit so intiger divides x by 2
+sub edx, eax				x*y - x/2 stored in edx
+mov eax, edx				moves this value^ to eax
+mov [esp+14h], eax			moves eax to z
+mov eax, [esp+14h]			moves third z back to eax
+mov [esp+4], eax			
+mov dword ptr [esp], offset aD ; "%d"	
+call _printf				//prints the value z.
+mov eax, 0				moves 0 to eax
+leave					
+retn					return 0;
+_main endp
+
+Q2) Find Greatest Value in an array, in this case the max item should be 432 or 1B0
+c file is called Q2.c
+//setup
+.text:00401500 push ebp				
+.text:00401501 mov ebp, esp
+.text:00401503 and esp, 0FFFFFFF0h
+.text:00401506 sub esp, 40h
+.text:00401509 call ___main
+
+//creating array
+.text:0040150E mov dword ptr [esp+18h], 0Ch		
+.text:00401516 mov dword ptr [esp+1Ch], 0Fh		
+.text:0040151E mov dword ptr [esp+20h], 0DDh		
+.text:00401526 mov dword ptr [esp+24h], 3		
+.text:0040152E mov dword ptr [esp+28h], 1B0h		
+.text:00401536 mov dword ptr [esp+2Ch], 36h		
+.text:0040153E mov dword ptr [esp+30h], 10h		
+.text:00401546 mov dword ptr [esp+34h], 43h		
+.text:0040154E mov dword ptr [esp+3Ch], 0		
+.text:00401556 mov dword ptr [esp+38h], 0	
+	
+.text:0040155E jmp short loc_40157F				jump to location 40157F
+.text:00401560 ; ------------------------------------------------------
+
+.text:00401560 loc_401560: ; CODE XREF: _main+84↓j								
+.text:00401560 mov eax, [esp+38h]				move offset/incrementer value to eax
+.text:00401564 mov eax, [esp+eax*4+18h]				move next element to check to eax
+.text:00401568 cmp eax, [esp+3Ch]				compares eax to old largest element 
+.text:0040156C jle short loc_40157A				jumps if less than or equal 
+.text:0040156E mov eax, [esp+38h]				move offset value to eax
+.text:00401572 mov eax, [esp+eax*4+18h]				moves new greatest value to eax
+.text:00401576 mov [esp+3Ch], eax				moves new greatest value to [esp+3Ch]
+
+.text:0040157A loc_40157A: ; CODE XREF: _main+6C↑j
+.text:0040157A add dword ptr [esp+38h], 1			increments offset/incrementer value
+
+.text:0040157F loc_40157F: ; CODE XREF: _main+5E↑j
+.text:0040157F cmp dword ptr [esp+38h], 7			checks to see if outside of the array using incrementer				
+.text:00401584 jle short loc_401560				if we are inside array jump to 401560
+.text:00401586 mov eax, [esp+3Ch]				Printing the value at esp+3Ch
+.text:0040158A mov [esp+4], eax					^
+.text:0040158E mov dword ptr [esp], offset aD ; "%d"		^
+.text:00401595 call _printf					^
+.text:0040159A mov eax, 0					reseting eax to 0
+EECS 349&444 (Fall 2019) – HW2					
+3
+//cloosing
+.text:0040159F leave			
+.text:004015A0 retn						return 0
+.text:004015A0 _main endp	
+
+Q3) increments a value and does math to dertmine when to print out that value
+a = x/100
+b = (x+(a)*-100)/10
+c = x - ((x/10)/4 + x/10)2
+
+//setup
+.text:00401500 push ebp
+.text:00401501 mov ebp, esp
+.text:00401503 and esp, 0FFFFFFF0h
+.text:00401506 sub esp, 20h
+.text:00401509 call ___main
+
+.text:0040150E mov dword ptr [esp+1Ch], 64h		store 64h or 100 in esp+1Ch I will call x
+.text:00401516 jmp loc_4015D6 				jump to 4015D6
+.text:0040151B ; ---------------------------------------------------------------------------
+
+.text:0040151B loc_40151B: ; CODE XREF: _main+DE↓j
+.text:0040151B mov ecx, [esp+1Ch]			moves x to ecx	
+.text:0040151F mov edx, 51EB851Fh			moves 51EB851Fh to edx //the next couple of lines are dividing by 100 using compiler optimizations
+.text:00401524 mov eax, ecx				movs x to eax
+.text:00401526 imul edx					multiplys eax and edx stores in eax (actually dividing x by 100)
+.text:00401528 sar edx, 5				divides edx by 2^5 
+.text:0040152B mov eax, ecx				moves the value in ecx to eax
+.text:0040152D sar eax, 1Fh				shifts eax by 31 bits becomes 0 
+.text:00401530 sub edx, eax				(x/100) - 0
+.text:00401532 mov eax, edx				move (x/100) to eax
+.text:00401534 mov [esp+18h], eax			move eax(x/100) to new variable I will call a
+.text:00401538 mov eax, [esp+18h]			
+.text:0040153C imul edx, eax, -64h			(a) * -100 stored in edx
+.text:0040153F mov eax, [esp+1Ch]			eax becomes x
+.text:00401543 lea ecx, [edx+eax]			ecx becomes x + (a)*-100
+.text:00401546 mov edx, 66666667h			moves large number to edx
+.text:0040154B mov eax, ecx				eax is now x + (a)*-100
+.text:0040154D imul edx					
+.text:0040154F sar edx, 2				above lines are efficient way to divide by 10 edx is now (x+(a)*-100)/10
+.text:00401552 mov eax, ecx				
+.text:00401554 sar eax, 1Fh				
+.text:00401557 sub edx, eax				
+.text:00401559 mov eax, edx				moves (x+(a)*-100)/10 to eax
+.text:0040155B mov [esp+14h], eax			variable b as i will call it is now b = (x+(a)*-100)/10
+.text:0040155F mov ecx, [esp+1Ch]			moves b to ecx
+.text:00401563 mov edx, 66666667h			moves large number to edx
+.text:00401568 mov eax, ecx				
+.text:0040156A imul edx					
+.text:0040156C sar edx, 2				the above lines are just dividing ecx by 10 so edx is now x/10
+.text:0040156F mov eax, ecx				moves ecx to eax or x to eax 
+.text:00401571 sar eax, 1Fh				
+.text:00401574 sub edx, eax					
+.text:00401576 mov eax, edx				moves x/10 to eax
+.text:00401578 shl eax, 2				multiplies x/10 by 4 eax is now (x/10)*4
+.text:0040157B add eax, edx				adds (x/10)*4 + x/10
+.text:0040157D add eax, eax				multiplies eax by 2 ((x/10)*4 + x/10)2
+.text:0040157F sub ecx, eax				ecx is now x - ((x/10)*4 + x/10)2
+.text:00401581 mov eax, ecx				moves eax to ecx so eax is now x - ((x/10)*4 + x/10)2
+.text:00401583 mov [esp+10h], eax			variable i will call c is now x - ((x/10)*4 + x/10)2
+.text:00401587 mov eax, [esp+18h]			moves a to eax
+.text:0040158B imul eax, [esp+18h]			
+.text:00401590 imul eax, [esp+18h]			a^3
+.text:00401595 mov edx, eax				moves a^3 to edx
+.text:00401597 mov eax, [esp+14h]			moves b to eax
+.text:0040159B imul eax, [esp+14h]			
+.text:004015A0 imul eax, [esp+14h]			b^3
+.text:004015A5 add edx, eax				addes b^3 to a^3 stores in edx (edx = b^3+a^3)
+.text:004015A7 mov eax, [esp+10h]			moves c to eax
+.text:004015AB imul eax, [esp+10h]
+.text:004015B0 imul eax, [esp+10h]			c^3
+.text:004015B5 add eax, edx				adds c^3 to (b^3+a^3)
+.text:004015B7 cmp eax, [esp+1Ch]			compares (a^3+b^3+c^3) to x
+.text:004015BB jnz short loc_4015D1			if they are equal then dont jump
+.text:004015BD mov eax, [esp+1Ch]			moves x to eax
+.text:004015C1 mov [esp+4], eax				
+.text:004015C5 mov dword ptr [esp], offset aD ; "%d "
+.text:004015CC call _printf				these 3 lines print eax or x
+
+.text:004015D1 loc_4015D1: ; CODE XREF: _main+BB↑j
+.text:004015D1 add dword ptr [esp+1Ch], 1		increments our x value
+
+.text:004015D6 loc_4015D6: ; CODE XREF: _main+16↑j
+.text:004015D6 cmp dword ptr [esp+1Ch], 3E7h		compares data in esp+1Ch to 3E7H
+.text:004015DE jle loc_40151B				if it is less or qual jump to 40151B 
+.text:004015E4 mov eax, 0				if greater end code
+.text:004015E9 leave					^
+.text:004015EA retn					^
+.text:004015EA _main endp				^
